@@ -1,0 +1,4 @@
+repository "Slime Sim Edu 2026-01-12_12-57-09/Slime Sim Edu@17867159613872@cloud"
+  path "/"
+    br "/main"
+    co "/main"
