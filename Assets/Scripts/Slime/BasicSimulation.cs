@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 public class BasicSimulation : MonoBehaviour
 {
     // Simulation parameters
@@ -23,6 +24,7 @@ public class BasicSimulation : MonoBehaviour
         public Vector2 pos; 
         public float angle; 
     }
+
 
     void Start()
     {
