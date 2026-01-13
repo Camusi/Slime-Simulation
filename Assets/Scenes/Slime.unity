@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 22238459}
   - component: {fileID: 22238460}
+  - component: {fileID: 22238461}
   m_Layer: 0
   m_Name: Simulation
   m_TagString: Untagged
@@ -161,16 +162,40 @@ MonoBehaviour:
   m_GameObject: {fileID: 22238458}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a099255e97a7b934aa258970c495acb6, type: 3}
+  m_Script: {fileID: 11500000, guid: 8fbed4beb3e8cb048a27565512d2e10a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BasicSimulation
+  m_EditorClassIdentifier: Assembly-CSharp::Simulation
   width: 1280
   height: 720
   numAgents: 2000
   speed: 20
   decay: 0.985
   targetMaterial: {fileID: 2100000, guid: 4771dc55e8bd2314aae0848741aba7c2, type: 2}
-  filterMode: 2
+  filterMode: 0
+--- !u!114 &22238461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22238458}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a099255e97a7b934aa258970c495acb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BasicSimulation
+  width: 1280
+  height: 720
+  numAgents: 20000
+  speed: 20
+  decay: 0.985
+  sensorDistance: 15
+  sensorAngle: 0.5
+  sensorRadius: 2
+  turnSpeed: 4
+  randomTurnStrength: 0.2
+  targetMaterial: {fileID: 2100000, guid: 4771dc55e8bd2314aae0848741aba7c2, type: 2}
+  filterMode: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
