@@ -166,11 +166,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SimulationCPU
   width: 1280
   height: 720
-  numAgents: 50000
+  numAgents: 2000
+  speed: 20
   decay: 0.985
-  species:
-  - {fileID: 11400000, guid: 98c4e0b3212e2484aa7742277bfcc987, type: 2}
-  - {fileID: 11400000, guid: f71b590a3ef2e6242b547f79b66cd46e, type: 2}
+  speciesList: 0000000002000000
+  sensorDistance: 15
+  sensorAngle: 0.5
+  sensorRadius: 2
+  turnSpeed: 4
+  randomTurnStrength: 0.2
   targetMaterial: {fileID: 2100000, guid: 4771dc55e8bd2314aae0848741aba7c2, type: 2}
   filterMode: 0
 --- !u!1 &519420028

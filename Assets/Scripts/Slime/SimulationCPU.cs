@@ -1,23 +1,15 @@
 using UnityEngine;
 
-public class Simulation : MonoBehaviour
+public class SimulationCPU : MonoBehaviour
 {
     // simulation parameters
     [Header("Simulation")]
     public int width = 1280;
     public int height = 720;
     public int numAgents = 2000;
-    public float speed = 20f;
     [Range(0.8f, 1f)] public float decay = 0.985f;
 
-    [Header("Sensors")]
-    public float sensorDistance = 15f;
-    public float sensorAngle = 0.5f; // how far appart the sensors are from eachother
-    public int sensorRadius = 2;
-
-    [Header("Sterring")]
-    public float turnSpeed = 4f;
-    public float randomTurnStrength = 0.2f;
+    public SpeciesSettingsSO[] species;
 
     [Header("Display")]
     public Material targetMaterial;
@@ -31,6 +23,15 @@ public class Simulation : MonoBehaviour
     struct Agent {
         public Vector2 pos;
         public float angle;
+
+        public Color color;
+        public float speed;
+        public float sensorAngle;
+        public float sensorDistance;
+        public int sensorRadius;
+        public float turnStrength;
+        public float randomTurnStrength;
+        public bool repel;
     }
 
     void Start()
@@ -70,6 +71,17 @@ public class Simulation : MonoBehaviour
             
             agents[i].pos = (new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius) + center;
             agents[i].angle = angle;
+
+            var slot = species[i % species.Length]; // cycle through slots
+
+            agents[i].color = slot.color;
+            agents[i].speed = slot.speed;
+            agents[i].sensorAngle = slot.sensorAngle;
+            agents[i].sensorDistance = slot.sensorDistance;
+            agents[i].sensorRadius = slot.sensorRadius;
+            agents[i].turnStrength = slot.turnStrength;
+            agents[i].randomTurnStrength = slot.randomTurnStrength;
+            agents[i].repel = slot.repel;
         }
     }
 
@@ -94,7 +106,7 @@ public class Simulation : MonoBehaviour
     }
 
     // returns an average brightness of the pixels in a circular area around the given position
-    float SampleSensor(Vector2 pos)
+    float SampleSensor(Vector2 pos, int sensorRadius, Color speciesColor, bool repel)
     {
         float sum = 0;
 
@@ -114,7 +126,19 @@ public class Simulation : MonoBehaviour
                     if (pixelY >= height) pixelY -= height;
 
                     int pixelIndex = pixelY * width + pixelX;
-                    sum += pixels[pixelIndex].r;
+
+                    if (repel)
+                    {
+                        Color pixel = pixels[pixelIndex];
+                        float value = pixel.r * speciesColor.r + pixel.g * speciesColor.g + pixel.b * speciesColor.b;
+
+                        float other = pixel.r + pixel.g + pixel.b - value;
+                        sum += value - other;
+                    }
+                    else
+                    {
+                        sum += pixels[pixelIndex].r;
+                    }
                 }
             }
         }
@@ -127,27 +151,27 @@ public class Simulation : MonoBehaviour
         {
             Agent currentAgent = agents[i];
 
-            Vector2 leftSensor = currentAgent.pos + new Vector2(Mathf.Cos(currentAgent.angle - sensorAngle), Mathf.Sin(currentAgent.angle - sensorAngle)) * sensorDistance;
-            Vector2 forwardSensor = currentAgent.pos + new Vector2(Mathf.Cos(currentAgent.angle), Mathf.Sin(currentAgent.angle)) * sensorDistance;
-            Vector2 rightSensor = currentAgent.pos + new Vector2(Mathf.Cos(currentAgent.angle + sensorAngle), Mathf.Sin(currentAgent.angle + sensorAngle)) * sensorDistance;
+            Vector2 leftSensor = currentAgent.pos + new Vector2(Mathf.Cos(currentAgent.angle - currentAgent.sensorAngle), Mathf.Sin(currentAgent.angle - currentAgent.sensorAngle)) * currentAgent.sensorDistance;
+            Vector2 forwardSensor = currentAgent.pos + new Vector2(Mathf.Cos(currentAgent.angle), Mathf.Sin(currentAgent.angle)) * currentAgent.sensorDistance;
+            Vector2 rightSensor = currentAgent.pos + new Vector2(Mathf.Cos(currentAgent.angle + currentAgent.sensorAngle), Mathf.Sin(currentAgent.angle + currentAgent.sensorAngle)) * currentAgent.sensorDistance;
 
-            float leftVal = SampleSensor(leftSensor);
-            float forwardVal = SampleSensor(forwardSensor);
-            float rightVal = SampleSensor(rightSensor);
+            float leftVal = SampleSensor(leftSensor, currentAgent.sensorRadius, currentAgent.color, currentAgent.repel);
+            float forwardVal = SampleSensor(forwardSensor, currentAgent.sensorRadius, currentAgent.color, currentAgent.repel);
+            float rightVal = SampleSensor(rightSensor, currentAgent.sensorRadius, currentAgent.color, currentAgent.repel);
 
             if (leftVal > rightVal && leftVal > forwardVal)
             {
-                currentAgent.angle -= turnSpeed * Time.deltaTime;
+                currentAgent.angle -= currentAgent.turnStrength * Time.deltaTime;
             } 
             else if (rightVal > leftVal && rightVal > forwardVal)
             {
-                currentAgent.angle += turnSpeed * Time.deltaTime;
+                currentAgent.angle += currentAgent.turnStrength * Time.deltaTime;
             }
 
-            currentAgent.angle += Random.Range(-randomTurnStrength, randomTurnStrength);
+            currentAgent.angle += Random.Range(-currentAgent.randomTurnStrength, currentAgent.randomTurnStrength);
 
             Vector2 dir_vec = new Vector2(Mathf.Cos(currentAgent.angle), Mathf.Sin(currentAgent.angle));  // Angle to vector formula
-            currentAgent.pos += dir_vec * speed * Time.deltaTime;  // d = vt. d = dir_vec * speed, t = Time.deltaTime (time since last frame)
+            currentAgent.pos += dir_vec * currentAgent.speed * Time.deltaTime;  // d = vt. d = dir_vec * speed, t = Time.deltaTime (time since last frame)
 
             // wrap around
             if (currentAgent.pos.x < 0) {currentAgent.pos.x += width;}
@@ -167,7 +191,7 @@ public class Simulation : MonoBehaviour
             int y = Mathf.FloorToInt(agents[i].pos.y);
 
             int pixel_index = y * width + x;
-            pixels[pixel_index] = Color.white;
+            pixels[pixel_index] = agents[i].color;
         }
     }
 
