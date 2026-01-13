@@ -129,15 +129,14 @@ public class SimulationCPU : MonoBehaviour
 
                     if (repel)
                     {
-                        Color pixel = pixels[pixelIndex];
-                        float value = pixel.r * speciesColor.r + pixel.g * speciesColor.g + pixel.b * speciesColor.b;
-
-                        float other = pixel.r + pixel.g + pixel.b - value;
-                        sum += value - other;
+                        if (pixels[pixelIndex] == speciesColor) 
+                            sum += 1f;
+                        else
+                            sum -= 1f;
                     }
                     else
                     {
-                        sum += pixels[pixelIndex].r;
+                        sum += pixels[pixelIndex].r + pixels[pixelIndex].g + pixels[pixelIndex].b;
                     }
                 }
             }
